@@ -1,1 +1,1 @@
-# atlas_committer
+# btc_layer2_committer
