@@ -2,9 +2,12 @@ package task
 
 import (
 	"encoding/hex"
+	"errors"
 	"fmt"
+	"github.com/btcsuite/btcd/btcutil"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/txscript"
+	"github.com/mapprotocol/btc_layer2_committer/utils"
 	"strings"
 	"testing"
 )
@@ -60,4 +63,40 @@ func Test_SplitString(t *testing.T) {
 	fmt.Printf("Original String: %s\n", inputString)
 	fmt.Printf("Split Result: %v\n", result)
 	fmt.Println("last string", result[len(result)-1])
+}
+
+func verifyBlockWithCheckPoint(ck *utils.CheckPoint) error {
+	url := "https://rpc.maplabs.io"
+	checkpoint, err := getMetadataByHeight(ck.Height.Uint64(), url)
+	if err != nil {
+		return err
+	}
+	if checkpoint.Equal(ck) {
+		return nil
+	}
+	return errors.New("")
+}
+
+func Test_CheckPoint(t *testing.T) {
+	testnet := true
+	netParams := &chaincfg.MainNetParams
+	if testnet {
+		netParams = &chaincfg.TestNet3Params
+	}
+	senderStr := ""
+	sender, err := btcutil.DecodeAddress(senderStr, netParams)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	checkpoint, err := fetchLatestCheckPoint(sender, nil, netParams)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	err = verifyBlockWithCheckPoint(checkpoint)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 }

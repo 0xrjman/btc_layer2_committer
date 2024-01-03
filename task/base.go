@@ -20,7 +20,7 @@ import (
 const (
 	defaultSequenceNum    = wire.MaxTxInSequenceNum - 10
 	defaultCommitOutValue = int64(610)
-	commitLength          = uint64(100000)
+	commitLength          = uint64(200000)
 )
 
 var (

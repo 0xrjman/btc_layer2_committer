@@ -3,7 +3,7 @@
     "sender": "ac17879d2966723ea4c67eda40ff21f63856740aade87a8cce4e764a4bc1b2a1",
     "atlas_url": "https://rpc.maplabs.io",
     "latest_check_point": {
-        "height": 5000000,
+        "height": 9000000,
         "root": "0xa447fbc19970f936ba22d20cce4996bbdc690253e813141e13ba7ccc55cfc137"
     }
 }

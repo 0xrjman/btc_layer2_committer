@@ -16,6 +16,15 @@ type CheckPoint struct {
 func (c *CheckPoint) String() string {
 	return fmt.Sprintf("height:%v", c.Height.Uint64(), "root:", c.Root)
 }
+func (c *CheckPoint) Equal(ck *CheckPoint) bool {
+	if ck == nil || c == nil {
+		return false
+	}
+	if c.Root == ck.Root && c.Height.Uint64() == ck.Height.Uint64() {
+		return true
+	}
+	return false
+}
 
 func IsEmpty(s string) bool {
 	return len(strings.TrimSpace(s)) == 0

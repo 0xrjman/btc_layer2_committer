@@ -275,6 +275,7 @@ func HandleGetFeeRate(network *chaincfg.Params) {
 }
 
 func Run() {
+	log.Info("-------begin---------")
 	netParams := &chaincfg.MainNetParams
 	if config.CfgParams.TestNet {
 		netParams = &chaincfg.TestNet3Params
