@@ -6,7 +6,7 @@ import (
 
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/wire"
-	"github.com/mapprotocol/atlas_committer/utils/btcapi"
+	"github.com/mapprotocol/btc_layer2_committer/utils/btcapi"
 )
 
 type MempoolClient struct {

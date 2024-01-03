@@ -12,16 +12,12 @@ import (
 	"github.com/btcsuite/btcd/wire"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/mapprotocol/atlas_committer/config"
-	"github.com/mapprotocol/atlas_committer/utils"
-	"github.com/mapprotocol/atlas_committer/utils/mempool"
+	"github.com/mapprotocol/btc_layer2_committer/config"
+	"github.com/mapprotocol/btc_layer2_committer/utils"
+	"github.com/mapprotocol/btc_layer2_committer/utils/mempool"
 	"math/big"
 	"time"
 )
-
-func getCheckPointFromCfg() (*utils.CheckPoint, error) {
-	return nil, nil
-}
 
 func makeTx(content []byte, feerate int64, sender, receiverAddress btcutil.Address,
 	outList []*PrevOutPoint, senderPriv *btcec.PrivateKey, btcApiClient *mempool.MempoolClient) (*wire.MsgTx, error) {
@@ -300,9 +296,13 @@ func Run() {
 		panic(err)
 	}
 
-	log.Info("fetch the latest checkpoint...")
+	log.Info("fetch the latest checkpoint...", "address", sender.String())
 	// get the checkpoint on the chain and update it
-	checkpoint, err := fetchLatestCheckPoint(sender, netParams)
+	checkpoint, err := fetchLatestCheckPoint(sender, config.CfgParams.LatestCheckPoint, netParams)
+	if err != nil {
+		log.Error("fetchLatestCheckPoint failed", err)
+		panic(err)
+	}
 	if config.CfgParams.LatestCheckPoint.Height.Uint64() < checkpoint.Height.Uint64() {
 		config.CfgParams.LatestCheckPoint = checkpoint
 	}
@@ -324,6 +324,7 @@ func Run() {
 				continue
 			}
 			config.CfgParams.LatestCheckPoint = ck
+			config.SaveConfig()
 		}
 		time.Sleep(looptimeout)
 	}

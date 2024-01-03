@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/mapprotocol/atlas_committer/utils"
+	"github.com/mapprotocol/btc_layer2_committer/utils"
 	"io/ioutil"
 )
 
@@ -35,7 +35,7 @@ func loadConfig(filename string) (*Config, error) {
 	return &config, nil
 }
 
-func saveConfig() error {
+func SaveConfig() error {
 	if CfgParams != nil {
 		configJSON, err := json.MarshalIndent(*CfgParams, "", "    ")
 		if err != nil {
@@ -51,7 +51,7 @@ func saveConfig() error {
 }
 
 func Init() {
-	flag.StringVar(&configFile, "config", "config/inscription-server-dev.yaml", "path of config file")
+	flag.StringVar(&configFile, "config", "config/config.json", "path of config file")
 	flag.Parse()
 	if configFile == "" {
 		flag.Usage()

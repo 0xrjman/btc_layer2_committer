@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"github.com/mapprotocol/atlas_committer/utils"
+	"github.com/mapprotocol/btc_layer2_committer/utils"
 	"math/big"
 	"testing"
 )
@@ -19,7 +19,7 @@ func Test_genCfg(t *testing.T) {
 		Root:   "0xa447fbc19970f936ba22d20cce4996bbdc690253e813141e13ba7ccc55cfc137",
 	}
 	CfgParams = config0
-	err := saveConfig()
+	err := SaveConfig()
 	if err != nil {
 		fmt.Println("Error saving configuration:", err)
 		return
@@ -41,7 +41,7 @@ func Test_01(t *testing.T) {
 		Height: big.NewInt(5000000),
 		Root:   "0xa447fbc19970f936ba22d20cce4996bbdc690253e813141e13ba7ccc55cfc137",
 	}
-	err = saveConfig()
+	err = SaveConfig()
 	if err != nil {
 		fmt.Println("Error saving configuration:", err)
 		return

@@ -9,7 +9,7 @@ import (
 	"github.com/btcsuite/btcd/btcutil"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/btcsuite/btcd/wire"
-	"github.com/mapprotocol/atlas_committer/utils/btcapi"
+	"github.com/mapprotocol/btc_layer2_committer/utils/btcapi"
 )
 
 type UTXO struct {
@@ -97,7 +97,7 @@ func (c *MempoolClient) ListUnspent(address btcutil.Address) ([]*btcapi.UnspentO
 	return unspentOutputs, nil
 }
 
-func (c *MempoolClient) GetAddressTxs(address btcutil.Address) ([]*SimTx, error) {
+func (c *MempoolClient) GetTxsFromAddress(address btcutil.Address) ([]*SimTx, error) {
 	res, err := c.request(http.MethodGet, fmt.Sprintf("/address/%s/txs", address.EncodeAddress()), nil)
 	if err != nil {
 		return nil, err

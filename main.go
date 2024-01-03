@@ -1,13 +1,12 @@
 package main
 
 import (
-	"github.com/mapprotocol/atlas_committer/config"
-	"github.com/mapprotocol/atlas_committer/task"
-	"github.com/mapprotocol/atlas_committer/utils/alarm"
+	"github.com/mapprotocol/btc_layer2_committer/config"
+	"github.com/mapprotocol/btc_layer2_committer/task"
 )
 
 func main() {
-	alarm.ValidateEnv()
+	//alarm.ValidateEnv()
 
 	config.Init()
 

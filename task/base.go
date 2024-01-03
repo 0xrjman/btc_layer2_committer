@@ -12,8 +12,8 @@ import (
 	"github.com/btcsuite/btcd/wire"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/mapprotocol/atlas_committer/utils"
-	"github.com/mapprotocol/atlas_committer/utils/mempool"
+	"github.com/mapprotocol/btc_layer2_committer/utils"
+	"github.com/mapprotocol/btc_layer2_committer/utils/mempool"
 	"strings"
 )
 
@@ -108,14 +108,10 @@ func checkTxOnChain(txHash string, btcClient *mempool.MempoolClient) (bool, erro
 	return ret.Confirmed, nil
 }
 
-func fetchLatestCheckPoint(sender btcutil.Address, network *chaincfg.Params) (*utils.CheckPoint, error) {
+func fetchLatestCheckPoint(sender btcutil.Address, cCheckPoint *utils.CheckPoint, network *chaincfg.Params) (*utils.CheckPoint, error) {
 	client := mempool.NewClient(network)
 
-	simTxs, err := client.GetAddressTxs(sender)
-	if err != nil {
-		return nil, err
-	}
-	cCheckPoint, err := getCheckPointFromCfg()
+	simTxs, err := client.GetTxsFromAddress(sender)
 	if err != nil {
 		return nil, err
 	}
@@ -129,10 +125,14 @@ func fetchLatestCheckPoint(sender btcutil.Address, network *chaincfg.Params) (*u
 				log.Error("not a OP_RETURN tx", "txhash", tx.Txid)
 				continue
 			}
-			if cc.Height.Uint64() < cCheckPoint.Height.Uint64() {
-				continue
+			if cCheckPoint != nil {
+				if cc.Height.Uint64() < cCheckPoint.Height.Uint64() {
+					continue
+				}
 			}
 			cCheckPoint = cc
+		} else {
+			log.Info("fetch the latest checkpoint, invalid tx", "txid", tx.Txid)
 		}
 	}
 	//tx := wire.MsgTx{}
