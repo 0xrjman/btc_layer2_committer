@@ -152,8 +152,8 @@ func timingCheck(txhash string, client *mempool.MempoolClient) bool {
 				log.Error("checkTxOnChain error", "error", err)
 			}
 		}
-		log.Info("checkTxOnChain......will retry for 5 minute later")
-		time.Sleep(5 * time.Minute)
+		log.Info("checkTxOnChain......will retry for 2 minute later")
+		time.Sleep(2 * time.Minute)
 	}
 }
 
@@ -316,6 +316,7 @@ func Run() {
 			time.Sleep(looptimeout)
 			continue
 		}
+		log.Info("running......", "current height", currentBlockNumber, "checkpoint height", config.CfgParams.LatestCheckPoint.Height)
 		if config.CfgParams.LatestCheckPoint.Height+commitLength < currentBlockNumber {
 			feerate := uint64(GlobalFeeRate) * 2
 			cur := config.CfgParams.LatestCheckPoint.Height + commitLength
@@ -328,6 +329,7 @@ func Run() {
 			config.CfgParams.LatestCheckPoint = ck
 			config.SaveConfig()
 		}
+
 		time.Sleep(looptimeout)
 	}
 }

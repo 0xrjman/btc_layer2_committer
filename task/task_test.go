@@ -233,18 +233,14 @@ func Test_CheckPoint3(t *testing.T) {
 		fmt.Println("invalid check point")
 		return
 	}
-	//cc, err := checkPointFromAsm(str)
-	//if err != nil {
-	//	fmt.Println(err)
-	//	return
-	//}
+
 	fmt.Println("finish")
 }
 
-func Test_03(t *testing.T) {
+func Test_getBlockInfosFromAtlas(t *testing.T) {
 	count, epoch := 2, 50000
 	for i := 0; i < count; i++ {
-		h := uint64(9400000 + i*epoch)
+		h := uint64(9000000 + i*epoch)
 		h0, err := getBlockHeader(h, mapURL)
 		if err != nil {
 			fmt.Println(err)
