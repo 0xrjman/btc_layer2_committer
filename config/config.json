@@ -1,9 +1,9 @@
 {
     "testnet": true,
-    "sender": "ac17879d2966723ea4c67eda40ff21f63856740aade87a8cce4e764a4bc1b2a1",
+    "sender": "7d9068c1c878a14139b911e417d8908be105e32b7c9ddfac90fc40208823abdd",
     "atlas_url": "https://rpc.maplabs.io",
     "latest_check_point": {
-        "height": 9000000,
-        "root": "0xa447fbc19970f936ba22d20cce4996bbdc690253e813141e13ba7ccc55cfc137"
+        "height": 9400000,
+        "root": "0xac9b201fa9f06ec786957685bae2fc7090f84f3d9740dd158da1c5fa0e1630ca"
     }
 }

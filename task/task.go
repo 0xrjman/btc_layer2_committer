@@ -111,7 +111,7 @@ func getMetadataFromAtlas(url string) ([]*utils.CheckPoint, error) {
 		}
 		datas = append(datas, &utils.CheckPoint{
 			Root:   h.Hash().String(),
-			Height: big.NewInt(int64(c)),
+			Height: c,
 		})
 	}
 	CurrentCommitHeight = c
@@ -135,10 +135,9 @@ func getMetadataByHeight(height uint64, url string) (*utils.CheckPoint, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return &utils.CheckPoint{
-		Root:   h.Hash().String(),
-		Height: big.NewInt(int64(height)),
+		Root:   h.Root.String(),
+		Height: height,
 	}, nil
 }
 
@@ -149,9 +148,11 @@ func timingCheck(txhash string, client *mempool.MempoolClient) bool {
 		if exist {
 			return exist
 		} else {
-			log.Error("checkTxOnChain error", "error", err)
+			if err != nil {
+				log.Error("checkTxOnChain error", "error", err)
+			}
 		}
-		log.Info("checkTxOnChain......")
+		log.Info("checkTxOnChain......will retry for 5 minute later")
 		time.Sleep(5 * time.Minute)
 	}
 }
@@ -275,9 +276,9 @@ func HandleGetFeeRate(network *chaincfg.Params) {
 }
 
 func Run() {
-	log.Info("-------begin---------")
 	netParams := &chaincfg.MainNetParams
 	if config.CfgParams.TestNet {
+		GlobalFeeRate = 5
 		netParams = &chaincfg.TestNet3Params
 	}
 
@@ -304,7 +305,7 @@ func Run() {
 		log.Error("fetchLatestCheckPoint failed", err)
 		panic(err)
 	}
-	if config.CfgParams.LatestCheckPoint.Height.Uint64() < checkpoint.Height.Uint64() {
+	if config.CfgParams.LatestCheckPoint.Height < checkpoint.Height {
 		config.CfgParams.LatestCheckPoint = checkpoint
 	}
 
@@ -315,9 +316,9 @@ func Run() {
 			time.Sleep(looptimeout)
 			continue
 		}
-		if config.CfgParams.LatestCheckPoint.Height.Uint64()+commitLength < currentBlockNumber {
-			feerate := uint64(GlobalFeeRate)
-			cur := config.CfgParams.LatestCheckPoint.Height.Uint64() + commitLength
+		if config.CfgParams.LatestCheckPoint.Height+commitLength < currentBlockNumber {
+			feerate := uint64(GlobalFeeRate) * 2
+			cur := config.CfgParams.LatestCheckPoint.Height + commitLength
 			ck, err := HandleCommitCheckPointTx(cur, feerate, config.CfgParams.AtlasURL, sender, senderKey, netParams)
 			if err != nil {
 				log.Error("commit checkpoint failed,wait for again...", "height", cur, "error", err)

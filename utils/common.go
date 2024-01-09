@@ -4,23 +4,22 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/ethereum/go-ethereum/log"
-	"math/big"
 	"strings"
 )
 
 type CheckPoint struct {
-	Height *big.Int `json:"height"`
-	Root   string   `json:"root"`
+	Height uint64 `json:"height"`
+	Root   string `json:"root"`
 }
 
 func (c *CheckPoint) String() string {
-	return fmt.Sprintf("height:%v", c.Height.Uint64(), "root:", c.Root)
+	return fmt.Sprintf("height:%v", c.Height, "root:", c.Root)
 }
 func (c *CheckPoint) Equal(ck *CheckPoint) bool {
 	if ck == nil || c == nil {
 		return false
 	}
-	if c.Root == ck.Root && c.Height.Uint64() == ck.Height.Uint64() {
+	if c.Root == ck.Root && c.Height == ck.Height {
 		return true
 	}
 	return false

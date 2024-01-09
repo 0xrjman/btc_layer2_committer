@@ -1,6 +1,8 @@
 package task
 
 import (
+	"encoding/binary"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"github.com/btcsuite/btcd/btcec/v2"
@@ -10,8 +12,8 @@ import (
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcd/wire"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/mapprotocol/btc_layer2_committer/utils"
 	"github.com/mapprotocol/btc_layer2_committer/utils/mempool"
 	"strings"
@@ -36,12 +38,25 @@ type PrevOutPoint struct {
 }
 
 func ToBytes(m *utils.CheckPoint) ([]byte, error) {
-	return rlp.EncodeToBytes(m)
+	b := make([]byte, 8)
+	binary.LittleEndian.PutUint64(b, m.Height)
+	h, err := hexutil.Decode(m.Root)
+	if err != nil {
+		return nil, err
+	}
+	if len(h) != 32 {
+		panic("invalid root length in to bytes")
+	}
+	return append(b, h...), nil
 }
 func FromBytes(data []byte) (*utils.CheckPoint, error) {
+	if len(data) != 40 {
+		return nil, errors.New("invalid data length in from bytes")
+	}
 	v := &utils.CheckPoint{}
-	err := rlp.DecodeBytes(data, v)
-	return v, err
+	v.Height = binary.LittleEndian.Uint64(data[0:8])
+	v.Root = hexutil.Encode(data[8:])
+	return v, nil
 }
 
 func setPrevOutPoint(outpoint *wire.OutPoint, val int64) {
@@ -120,13 +135,21 @@ func fetchLatestCheckPoint(sender btcutil.Address, cCheckPoint *utils.CheckPoint
 		tx := simTxs[len(simTxs)-i-1]
 		if sender.String() == tx.Sender && len(tx.OutPuts) == 2 {
 			str := tx.OutPuts[0].Scriptpubkey_asm
+			script, err := hex.DecodeString(tx.OutPuts[0].Scriptpubkey)
+			if err != nil {
+				log.Error("decode the Scriptpubkey failed", "err", err, "txid", tx.Txid.String())
+				continue
+			}
+			if !txscript.IsNullData(script) {
+				fmt.Println(tx.Txid.String(), "is a op_return tx")
+			}
 			cc, err := checkPointFromAsm(str)
 			if err != nil {
 				log.Error("not a OP_RETURN tx", "txhash", tx.Txid)
 				continue
 			}
 			if cCheckPoint != nil {
-				if cc.Height.Uint64() < cCheckPoint.Height.Uint64() {
+				if cc.Height < cCheckPoint.Height {
 					continue
 				}
 			}
@@ -142,11 +165,16 @@ func fetchLatestCheckPoint(sender btcutil.Address, cCheckPoint *utils.CheckPoint
 
 func checkPointFromAsm(str string) (*utils.CheckPoint, error) {
 	result := strings.Split(str, " ")
-	if len(result) != 2 {
+	// op_return op_pushbytes data
+	if len(result) != 3 {
 		return nil, errors.New("invalid script length")
 	}
 	strScript := result[len(result)-1]
-	return FromBytes([]byte(strScript))
+	b0, err := hex.DecodeString(strScript)
+	if err != nil {
+		return nil, err
+	}
+	return FromBytes(b0)
 }
 
 func makeTpAddress(privKey *btcec.PrivateKey, network *chaincfg.Params) (btcutil.Address, error) {
