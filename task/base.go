@@ -134,7 +134,7 @@ func fetchLatestCheckPoint(sender btcutil.Address, cCheckPoint *utils.CheckPoint
 	for i := range simTxs {
 		tx := simTxs[len(simTxs)-i-1]
 		if sender.String() == tx.Sender && len(tx.OutPuts) == 2 {
-			str := tx.OutPuts[0].Scriptpubkey_asm
+			//str := tx.OutPuts[0].Scriptpubkey_asm
 			script, err := hex.DecodeString(tx.OutPuts[0].Scriptpubkey)
 			if err != nil {
 				log.Error("decode the Scriptpubkey failed", "err", err, "txid", tx.Txid.String())
@@ -143,7 +143,7 @@ func fetchLatestCheckPoint(sender btcutil.Address, cCheckPoint *utils.CheckPoint
 			if !txscript.IsNullData(script) {
 				fmt.Println(tx.Txid.String(), "is a op_return tx")
 			}
-			cc, err := checkPointFromAsm(str)
+			cc, err := checkPointFromScript(script)
 			if err != nil {
 				log.Error("not a OP_RETURN tx", "txhash", tx.Txid)
 				continue
@@ -175,6 +175,13 @@ func checkPointFromAsm(str string) (*utils.CheckPoint, error) {
 		return nil, err
 	}
 	return FromBytes(b0)
+}
+func checkPointFromScript(script []byte) (*utils.CheckPoint, error) {
+	if len(script) == 42 {
+		b0 := script[2:]
+		return FromBytes(b0)
+	}
+	return nil, errors.New("invalid script in parse checkpoint")
 }
 
 func makeTpAddress(privKey *btcec.PrivateKey, network *chaincfg.Params) (btcutil.Address, error) {

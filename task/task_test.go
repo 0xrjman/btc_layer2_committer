@@ -157,6 +157,7 @@ func Test_CheckPoint(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
+	fmt.Println("finish....")
 }
 
 func Test_GetFeeRecommend(t *testing.T) {
@@ -261,5 +262,4 @@ func Test_getMatedata(t *testing.T) {
 		fmt.Println("index", i, "root", ck.Root)
 		time.Sleep(5 * time.Second)
 	}
-
 }
